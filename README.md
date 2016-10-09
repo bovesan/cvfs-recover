@@ -1,2 +1,2 @@
-# cvfs-restore
-Backup and restoration utilities for corrupted Stornext metadata
+# cvfs-recover
+Backup and restoration utilities for corrupted files in Stornext metadata
