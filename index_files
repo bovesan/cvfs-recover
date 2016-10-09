@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+echo Daily backup. Writing total SAN file list... | wall
+
+
+
+date=`date +%F`
+cd /Volumes
+#find * -ls -path 'FAULTY_FOLDER' -prune > /Volumes/dailyBackup/Files.$date.ls 
+find CENTRAL Encoded MATERIAL_HF SAN2 SAN3 SLOW_HF -ls | gzip > /Volumes/CENTRAL/Archive/Statistics/SANindex/Files.$date.ls.gz
+
+echo ... file list written to /Volumes/CENTRAL/Archive/Statistics/SANindex
+
