@@ -7,8 +7,14 @@ def getuncompressedsize(filename):
         f.seek(-4, 2)
         return struct.unpack('I', f.read(4))[0]
 
+def path_mount_point(path):
+    path = os.path.abspath(path)
+    while not os.path.ismount(path):
+        path = os.path.dirname(path)
+    return path
+
 usage = """Usage:
-recover.py [-n] [--limit=0] directory_with_FOUND_files volume_index_file
+recover.py [-n] [--limit=0] directory_with_FOUND_files index_file
 """
 
 found_files = {}
@@ -50,7 +56,7 @@ if len(logs) == 0 and ( len(indexes) == 0 or len(found_files) == 0 ):
 	print usage
 	sys.exit(1)
 
-print '\n'
+print '\n',
 
 lognr = 0
 while os.path.isfile(params['log'] % lognr):
@@ -63,7 +69,6 @@ for index in indexes:
 	print 'Looking for matches in ' + index
 	if index.endswith('.gz'):
 		zipped = True
-		print index+' is zipped. Switching to gzip mode.'
 		index_size = getuncompressedsize(index)
 		f = gzip.open(index)
 	else:
@@ -80,7 +85,7 @@ for index in indexes:
 		#print repr(line_split)
 		inode_number = int(line_split[0])
 		stored_path = volume_root+line_split[-1].decode('string_escape')
-		if inode_number in found_files and not os.path.exists(stored_path):
+		if inode_number in found_files and not os.path.exists(stored_path) and path_mount_point(stored_path) == path_mount_point(found_files[inode_number]):
 			parent_dir = os.path.dirname(stored_path)
 			if not os.path.isdir(parent_dir):
 				try:
@@ -89,7 +94,7 @@ for index in indexes:
 				except OSError as e:
 					loglinedir = ('Could not create missing directory: %s ' % parent_dir)+("Error({0}): {1}\n".format(e.errno, e.strerror))
 				open(logfile, 'a').write(loglinedir)
-				print loglinedir,
+				print '\r'+loglinedir,
 			logline = ('Inode: %i ' % inode_number).ljust(20)+'%s > %s\n' % (found_files[inode_number], stored_path)
 			if not no_apply:
 				try:
