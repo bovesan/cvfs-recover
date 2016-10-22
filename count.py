@@ -47,6 +47,7 @@ def count(path, recursive=False, delete=False):
 i = 0
 delete = False
 recursive = False
+quiet = False
 width = get_terminal_size().x
 for arg in sys.argv[1:]:
 	if arg.startswith('-'):
@@ -57,7 +58,7 @@ for arg in sys.argv[1:]:
 				recursive = True
 			elif char == 'q':
 				quiet = True
-	if os.path.isdir(arg):
+	elif os.path.isdir(arg):
 		counter = 1
 		count(arg, recursive, delete)
 		width = get_terminal_size().x
